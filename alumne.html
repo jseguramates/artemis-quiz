@@ -63,6 +63,9 @@ input.ans-input{font-size:1.2rem;text-align:center;font-family:'Orbitron',monosp
 .rank-pts{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--accent);}
 .player-badge{display:inline-flex;align-items:center;gap:8px;background:var(--deep);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-size:0.85rem;color:var(--accent);margin-bottom:1.25rem;}
 .player-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+.curiositat-box{background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;animation:fadeIn 0.5s ease;}
+.curiositat-label{font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;}
+.curiositat-text{font-size:0.85rem;color:var(--text);line-height:1.6;opacity:0.9;}
 .kicked-screen{text-align:center;padding:2rem 1rem;}
 .kicked-icon{font-size:3rem;margin-bottom:1rem;}
 .kicked-title{font-family:'Orbitron',monospace;font-size:1rem;color:var(--red);margin-bottom:0.5rem;}
@@ -106,6 +109,10 @@ input.ans-input{font-size:1.2rem;text-align:center;font-family:'Orbitron',monosp
       <input type="text" id="inp-resp" class="ans-input" placeholder="Escriu aquí..." />
       <button class="btn-join" id="btn-enviar" onclick="sendAnswer()">Enviar resposta</button>
       <div id="alumne-feedback" style="display:none;"></div>
+      <div id="curiositat-box" class="curiositat-box" style="display:none;">
+        <div class="curiositat-label">&#9733; Curiositat Artemis</div>
+        <div class="curiositat-text" id="curiositat-text"></div>
+      </div>
     </div>
     <div id="phase-results" style="display:none">
       <div id="my-result-area"></div>
@@ -173,6 +180,7 @@ async function poll(){
     if(state.questionId!==currentQId){
       currentQId=state.questionId;
       hasAnswered=false;
+      stopCuriositatRotation();
       document.getElementById('alumne-eq').textContent=state.question;
       document.getElementById('inp-resp').value='';
       document.getElementById('alumne-feedback').style.display='none';
@@ -182,6 +190,7 @@ async function poll(){
     if(!hasAnswered)showPhase('active');
   } else if(state.phase==='results'){
     if(timerInterval)clearInterval(timerInterval);
+    stopCuriositatRotation();
     showPhase('results');
     renderRanking(state.ranking||[]);
   }
@@ -230,12 +239,55 @@ async function sendAnswer(){
     const prev=(player&&player.points)?player.points:0;
     await fbPatch('/players/'+safeName,{points:prev+pts});
   }
+  startCuriositatRotation();
   const fb=document.getElementById('alumne-feedback');
   fb.style.display='block';
   fb.className='feedback '+(correct?'ok':'ko');
   fb.innerHTML=correct
     ?`<div class="feedback-icon">🚀</div><div class="feedback-title">+${pts} PUNTS!</div><div class="feedback-sub">Resposta correcta${speedBonus>0?' · +'+speedBonus+' bonus velocitat':''}!</div>`
     :'<div class="feedback-icon">🌑</div><div class="feedback-title">Incorrecte</div><div class="feedback-sub">Millor sort a la propera pregunta!</div>';
+}
+
+const CURIOSITATS = [
+  "La Lluna s'allunya de la Terra uns 3,8 cm cada any a causa de la gravetat.",
+  "Artemis II serà la primera missió tripulada que orbita la Lluna des de l'Apollo 17 el 1972.",
+  "La gravetat a la Lluna és 6 vegades menor que a la Terra: un astronauta de 70 kg hi pesaria només 12 kg.",
+  "La missió Artemis II durarà aproximadament 10 dies i portarà 4 astronautes.",
+  "La Lluna no té atmosfera: la temperatura passa de 127°C de dia a -173°C de nit.",
+  "L'Orion, la nau d'Artemis II, viatjarà fins a 9.600 km més enllà de la Lluna: el punt més llunyà de la Terra mai assolit per humans.",
+  "La superfície de la Lluna és coberta per una capa de pols fina anomenada regolit, formada per impactes de meteorits.",
+  "Un dia a la Lluna (de sortida a posta de sol) dura 29,5 dies terrestres.",
+  "La Lluna té muntanyes de fins a 5.000 metres d'altura, semblants als Alps.",
+  "Christina Koch, astronauta d'Artemis II, serà la primera dona a orbitar la Lluna.",
+  "El soroll no es propaga a la Lluna: és un silenci absolut, perquè no hi ha aire.",
+  "La distància mitjana entre la Terra i la Lluna és de 384.400 km: uns 30 diàmetres terrestres.",
+  "Des de la Lluna, la Terra es veu 4 vegades més gran que la Lluna vista des d'aquí.",
+  "Les petjades dels astronautes de l'Apollo seguiran a la Lluna durant milions d'anys, perquè no hi ha vent.",
+  "El programa Artemis vol establir una presència humana permanent a la Lluna com a pas previ a Mart.",
+  "La Lluna es va formar fa uns 4.500 milions d'anys, probablement per l'impacte d'un cos de la mida de Mart contra la Terra.",
+  "Reid Wiseman, comandant d'Artemis II, ha passat més de 200 dies a l'Estació Espacial Internacional.",
+  "La Lluna manté sempre la mateixa cara cap a la Terra gràcies a un fenomen anomenat rotació síncrona.",
+  "L'aigua en forma de gel descoberta als pols lunars podria ser clau per a futures missions de llarga durada.",
+  "El Gateway, l'estació espacial lunar prevista per Artemis III, orbitarà la Lluna en una òrbita halo.",
+];
+
+let curiositatInterval = null;
+
+function showCuriositat(){
+  const idx = Math.floor(Math.random() * CURIOSITATS.length);
+  document.getElementById('curiositat-text').textContent = CURIOSITATS[idx];
+  document.getElementById('curiositat-box').style.display = 'block';
+}
+
+function startCuriositatRotation(){
+  showCuriositat();
+  if(curiositatInterval) clearInterval(curiositatInterval);
+  curiositatInterval = setInterval(showCuriositat, 8000);
+}
+
+function stopCuriositatRotation(){
+  if(curiositatInterval){ clearInterval(curiositatInterval); curiositatInterval = null; }
+  document.getElementById('curiositat-box').style.display = 'none';
 }
 
 function renderRanking(ranking){
