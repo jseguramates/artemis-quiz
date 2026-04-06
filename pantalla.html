@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artemis Quiz — Pantalla</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--space:#020818;--deep:#050d2a;--panel:#0a1535;--accent:#4fc3f7;--accent2:#7c4dff;--gold:#ffd54f;--green:#69f0ae;--red:#ff5252;--text:#e8f4fd;--muted:#7a9cc0;--border:rgba(79,195,247,0.2);}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{background:var(--space);color:var(--text);font-family:'Exo 2',sans-serif;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(124,77,255,0.1),transparent 55%),radial-gradient(ellipse at 80% 20%,rgba(79,195,247,0.08),transparent 50%);pointer-events:none;z-index:0;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:0.15}50%{opacity:0.9}}
+.screen{position:relative;z-index:1;width:100vw;height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2.5rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo-wrap{display:flex;align-items:center;gap:0.75rem;}
+.logo-moon{width:40px;height:40px;background:radial-gradient(circle at 35% 35%,#fff8e1,#ffd54f,#f57f17);border-radius:50%;position:relative;box-shadow:0 0 18px rgba(255,213,79,0.5);flex-shrink:0;}
+.logo-moon::after{content:'';position:absolute;top:5px;right:3px;width:12px;height:12px;background:var(--space);border-radius:50%;}
+.brand{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;letter-spacing:2px;color:var(--accent);}
+.brand span{color:var(--gold);}
+.session-tag{font-size:0.8rem;color:var(--muted);letter-spacing:1px;}
+.top-right{display:flex;align-items:center;gap:1.5rem;}
+.connected-pill{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:0.85rem;color:var(--muted);}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* FASES */
+.phase{display:none;flex:1;flex-direction:column;}
+.phase.active{display:flex;}
+
+/* FASE ESPERA */
+.waiting-wrap{flex:1;display:flex;gap:2rem;padding:2rem 2.5rem;}
+.waiting-left{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.orbit-big{width:160px;height:160px;border:2px solid rgba(79,195,247,0.2);border-radius:50%;position:relative;animation:spin 6s linear infinite;margin-bottom:2rem;}
+.orbit-big::before{content:'';position:absolute;width:18px;height:18px;background:var(--accent);border-radius:50%;top:-9px;left:calc(50% - 9px);box-shadow:0 0 16px var(--accent);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.waiting-msg{font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--muted);letter-spacing:2px;text-align:center;}
+.waiting-right{width:380px;display:flex;flex-direction:column;}
+.ranking-title{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
+.rank-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;margin-bottom:8px;background:var(--panel);border:1px solid var(--border);}
+.rank-item.pos-1{background:rgba(255,213,79,0.1);border-color:rgba(255,213,79,0.3);}
+.rank-item.pos-2{background:rgba(176,190,197,0.08);border-color:rgba(176,190,197,0.2);}
+.rank-item.pos-3{background:rgba(255,138,101,0.08);border-color:rgba(255,138,101,0.2);}
+.rank-pos{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;width:36px;color:var(--muted);}
+.pos-1 .rank-pos{color:var(--gold);}
+.pos-2 .rank-pos{color:#b0bec5;}
+.pos-3 .rank-pos{color:#ff8a65;}
+.rank-name{flex:1;font-size:1.1rem;font-weight:500;}
+.rank-pts{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--accent);}
+
+/* FASE ACTIVA */
+.active-wrap{flex:1;display:grid;grid-template-columns:1fr 320px;gap:0;}
+.active-main{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 3rem;border-right:1px solid var(--border);}
+.question-label{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem;}
+.eq-big{font-family:'Orbitron',monospace;font-size:3.5rem;font-weight:900;color:var(--gold);text-align:center;text-shadow:0 0 40px rgba(255,213,79,0.5);line-height:1.1;margin-bottom:2.5rem;letter-spacing:2px;word-break:break-all;}
+.timer-wrap{width:100%;max-width:500px;}
+.timer-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;}
+.timer-num{font-family:'Orbitron',monospace;font-size:3rem;font-weight:900;color:var(--accent);text-shadow:0 0 20px rgba(79,195,247,0.5);line-height:1;}
+.timer-num.urgent{color:var(--red);text-shadow:0 0 20px rgba(255,82,82,0.5);animation:shake 0.3s infinite;}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.timer-label{font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.timer-bar{height:10px;background:rgba(79,195,247,0.12);border-radius:99px;overflow:hidden;}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 1s linear;}
+.timer-fill.urgent{background:linear-gradient(90deg,#c62828,var(--red));}
+.resp-info{margin-top:1.5rem;font-size:1rem;color:var(--muted);text-align:center;}
+.resp-info strong{color:var(--green);font-size:1.3rem;}
+
+.active-side{padding:1.5rem;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+.side-title{font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;flex-shrink:0;}
+.player-pill{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;background:var(--panel);border:1px solid var(--border);transition:all 0.4s;}
+.player-pill.answered{background:rgba(105,240,174,0.08);border-color:rgba(105,240,174,0.35);}
+.pp-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,213,79,0.5);flex-shrink:0;transition:all 0.3s;}
+.player-pill.answered .pp-dot{background:var(--green);box-shadow:0 0 8px var(--green);}
+.pp-name{font-size:1rem;font-weight:500;flex:1;}
+.pp-check{font-size:1rem;color:var(--green);opacity:0;transition:opacity 0.3s;}
+.player-pill.answered .pp-check{opacity:1;}
+
+/* FASE RESULTATS */
+.results-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.results-left{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem 3rem;border-right:1px solid var(--border);}
+.result-label{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:3px;color:var(--muted);margin-bottom:0.75rem;text-transform:uppercase;}
+.result-eq{font-family:'Orbitron',monospace;font-size:2rem;color:var(--muted);text-align:center;margin-bottom:0.5rem;opacity:0.7;}
+.result-sol{font-family:'Orbitron',monospace;font-size:4rem;font-weight:900;color:var(--green);text-align:center;text-shadow:0 0 40px rgba(105,240,174,0.4);margin-bottom:2rem;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.stats-row{display:flex;gap:1.5rem;margin-bottom:1.5rem;}
+.stat-box{text-align:center;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1rem 1.5rem;}
+.stat-num{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;margin-bottom:4px;}
+.stat-num.good{color:var(--green);}
+.stat-num.mid{color:var(--gold);}
+.stat-num.bad{color:var(--red);}
+.stat-lbl{font-size:0.75rem;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;}
+.semaforo-big{display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:12px;font-size:0.95rem;max-width:420px;text-align:left;}
+.semaforo-big.green{background:rgba(105,240,174,0.1);border:1px solid rgba(105,240,174,0.3);color:var(--green);}
+.semaforo-big.yellow{background:rgba(255,213,79,0.1);border:1px solid rgba(255,213,79,0.3);color:var(--gold);}
+.semaforo-big.red{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);color:var(--red);}
+.sem-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
+.semaforo-big.green .sem-dot{background:var(--green);}
+.semaforo-big.yellow .sem-dot{background:var(--gold);}
+.semaforo-big.red .sem-dot{background:var(--red);}
+
+.results-right{display:flex;flex-direction:column;justify-content:center;padding:2rem 2.5rem;gap:12px;}
+.podium-item{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:12px;background:var(--panel);border:1px solid var(--border);animation:slideIn 0.4s ease both;}
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.podium-item.pos-1{background:rgba(255,213,79,0.12);border-color:rgba(255,213,79,0.4);animation-delay:0.1s;}
+.podium-item.pos-2{background:rgba(176,190,197,0.08);border-color:rgba(176,190,197,0.25);animation-delay:0.2s;}
+.podium-item.pos-3{background:rgba(255,138,101,0.08);border-color:rgba(255,138,101,0.25);animation-delay:0.3s;}
+.pod-medal{font-size:2rem;width:44px;text-align:center;flex-shrink:0;}
+.pod-name{flex:1;font-size:1.3rem;font-weight:500;}
+.pod-pts{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--accent);}
+.others-list{display:flex;flex-direction:column;gap:6px;margin-top:0.5rem;}
+.other-item{display:flex;align-items:center;gap:12px;padding:8px 14px;border-radius:8px;background:var(--deep);border:1px solid var(--border);animation:slideIn 0.4s ease both;}
+.other-pos{font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--muted);width:28px;}
+.other-name{flex:1;font-size:0.95rem;}
+.other-pts{font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="screen">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo-wrap">
+      <div class="logo-moon"></div>
+      <div>
+        <div class="brand">ARTEMIS <span>QUIZ</span></div>
+        <div class="session-tag" id="session-tag">Missió Monomis</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="connected-pill">
+        <div class="conn-dot"></div>
+        <span id="conn-num">0</span>&nbsp;alumnes connectats
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE: ESPERANT -->
+  <div class="phase active" id="phase-waiting">
+    <div class="waiting-wrap">
+      <div class="waiting-left">
+        <div class="orbit-big"></div>
+        <div class="waiting-msg">Esperant la propera pregunta...</div>
+      </div>
+      <div class="waiting-right">
+        <div class="ranking-title">Ranking actual</div>
+        <div id="waiting-ranking"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE: PREGUNTA ACTIVA -->
+  <div class="phase" id="phase-active">
+    <div class="active-wrap">
+      <div class="active-main">
+        <div class="question-label">Operació amb monomis</div>
+        <div class="eq-big" id="active-eq">?</div>
+        <div class="timer-wrap">
+          <div class="timer-row">
+            <div class="timer-label">Temps restant</div>
+            <div class="timer-num" id="timer-num">45</div>
+          </div>
+          <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+        </div>
+        <div class="resp-info"><strong id="resp-count">0</strong> alumnes han respost</div>
+      </div>
+      <div class="active-side">
+        <div class="side-title">Participants</div>
+        <div id="players-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE: RESULTATS -->
+  <div class="phase" id="phase-results">
+    <div class="results-wrap">
+      <div class="results-left">
+        <div class="result-label">Resposta correcta</div>
+        <div class="result-eq" id="result-eq"></div>
+        <div class="result-sol" id="result-sol"></div>
+        <div class="stats-row" id="result-stats"></div>
+        <div id="result-semaforo"></div>
+      </div>
+      <div class="results-right">
+        <div class="ranking-title">Ranking de la missió</div>
+        <div id="podium-top3"></div>
+        <div class="others-list" id="podium-rest"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DB='https://monomis-quiz-default-rtdb.europe-west1.firebasedatabase.app';
+let currentQId=null, timerInterval=null, timerTotal=45, timerLeft=45;
+
+function mkStars(){
+  const c=document.getElementById('stars');
+  const sizes=[1,1,1,2,2,2,2,3];
+  for(let i=0;i<200;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=sizes[Math.floor(Math.random()*sizes.length)];
+    s.style.width=sz+'px';s.style.height=sz+'px';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--d',(2+Math.random()*5)+'s');
+    s.style.setProperty('--delay',(Math.random()*5)+'s');
+    s.style.opacity=Math.random()*0.6;
+    c.appendChild(s);
+  }
+}
+mkStars();
+
+async function fbGet(p){const r=await fetch(DB+p+'.json');return r.json();}
+
+function showPhase(p){
+  document.querySelectorAll('.phase').forEach(el=>el.classList.remove('active'));
+  document.getElementById('phase-'+p).classList.add('active');
+}
+
+async function poll(){
+  const [state,players]=await Promise.all([fbGet('/game'),fbGet('/players')]);
+  const playerList=Object.values(players||{});
+  document.getElementById('conn-num').textContent=playerList.length;
+
+  if(!state||state.phase==='waiting'){
+    showPhase('waiting');
+    if(state&&state.sessionName)document.getElementById('session-tag').textContent=state.sessionName;
+    renderWaitingRanking(playerList);
+    if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+    currentQId=null;
+
+  } else if(state.phase==='active'){
+    if(state.sessionName)document.getElementById('session-tag').textContent=state.sessionName;
+    if(state.questionId!==currentQId){
+      currentQId=state.questionId;
+      document.getElementById('active-eq').textContent=state.question;
+      startTimer(state.timeLimit||45,state.startedAt||Date.now());
+    }
+    showPhase('active');
+    const responses=state.responses||{};
+    const answered=Object.values(responses).map(r=>r.name);
+    document.getElementById('resp-count').textContent=answered.length;
+    document.getElementById('players-list').innerHTML=playerList.map(p=>{
+      const has=answered.includes(p.name);
+      return `<div class="player-pill ${has?'answered':''}">
+        <div class="pp-dot"></div>
+        <div class="pp-name">${p.name}</div>
+        <div class="pp-check">✓</div>
+      </div>`;
+    }).join('');
+
+  } else if(state.phase==='results'){
+    if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+    showPhase('results');
+    document.getElementById('result-eq').textContent=state.question;
+    document.getElementById('result-sol').textContent=state.solution;
+    const responses=Object.values(state.responses||{});
+    const correct=responses.filter(r=>r.correct).length;
+    const pct=responses.length?Math.round((correct/responses.length)*100):0;
+    const pctCls=pct>=70?'good':pct>=40?'mid':'bad';
+    document.getElementById('result-stats').innerHTML=`
+      <div class="stat-box"><div class="stat-num ${pctCls}">${pct}%</div><div class="stat-lbl">Encerts</div></div>
+      <div class="stat-box"><div class="stat-num">${responses.length}/${playerList.length}</div><div class="stat-lbl">Han respost</div></div>`;
+    const sem=pct>=70?{cls:'green',msg:'Molt bé! Podem continuar.'}:
+              pct>=40?{cls:'yellow',msg:'Resultat acceptable. Considera repassar-ho breument.'}:
+              {cls:'red',msg:'Molts errors. Convé explicar-ho de nou.'};
+    document.getElementById('result-semaforo').innerHTML=`
+      <div class="semaforo-big ${sem.cls}"><div class="sem-dot"></div><span>${sem.msg}</span></div>`;
+    renderPodium(state.ranking||[]);
+  }
+}
+
+function renderWaitingRanking(players){
+  const sorted=players.sort((a,b)=>(b.points||0)-(a.points||0));
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('waiting-ranking').innerHTML=sorted.length
+    ?sorted.slice(0,8).map((p,i)=>`
+      <div class="rank-item ${i<3?'pos-'+(i+1):''}">
+        <div class="rank-pos">${medals[i]||('#'+(i+1))}</div>
+        <div class="rank-name">${p.name}</div>
+        <div class="rank-pts">${p.points||0} pts</div>
+      </div>`).join('')
+    :'<div style="color:var(--muted);font-size:0.9rem;text-align:center;padding:1rem">Esperant que els alumnes es connectin...</div>';
+}
+
+function renderPodium(ranking){
+  const medals=['🥇','🥈','🥉'];
+  const top3=ranking.slice(0,3);
+  const rest=ranking.slice(3,8);
+  document.getElementById('podium-top3').innerHTML=top3.map((r,i)=>`
+    <div class="podium-item pos-${i+1}">
+      <div class="pod-medal">${medals[i]}</div>
+      <div class="pod-name">${r.name}</div>
+      <div class="pod-pts">${r.points} pts</div>
+    </div>`).join('');
+  document.getElementById('podium-rest').innerHTML=rest.map((r,i)=>`
+    <div class="other-item" style="animation-delay:${0.4+(i*0.08)}s">
+      <div class="other-pos">#${i+4}</div>
+      <div class="other-name">${r.name}</div>
+      <div class="other-pts">${r.points} pts</div>
+    </div>`).join('');
+}
+
+function startTimer(total,startedAt){
+  if(timerInterval)clearInterval(timerInterval);
+  timerTotal=total;
+  const update=()=>{
+    const elapsed=Math.floor((Date.now()-startedAt)/1000);
+    timerLeft=Math.max(0,total-elapsed);
+    const pct=(timerLeft/total)*100;
+    document.getElementById('timer-num').textContent=timerLeft;
+    document.getElementById('timer-num').className='timer-num'+(timerLeft<=10?' urgent':'');
+    const fill=document.getElementById('timer-fill');
+    fill.style.width=pct+'%';
+    fill.className='timer-fill'+(timerLeft<=10?' urgent':'');
+    if(timerLeft<=0)clearInterval(timerInterval);
+  };
+  update();timerInterval=setInterval(update,1000);
+}
+
+poll();setInterval(poll,2000);
+</script>
+</body>
+</html>
