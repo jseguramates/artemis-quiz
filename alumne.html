@@ -242,20 +242,36 @@ function renderRanking(ranking){
   const medals=['🥇','🥈','🥉'];
   const myPos=ranking.findIndex(r=>r.name===nom);
   const myEntry=ranking[myPos];
+  const total=ranking.length;
+
   let myResultHtml='';
   if(myEntry){
-    myResultHtml=`<div class="feedback ${myPos===0?'ok':'wait'}" style="margin-bottom:1rem">
-      <div class="feedback-title">${myPos===0?'🏆 Líder de la missió!':'La teva posició: #'+(myPos+1)}</div>
+    const isTop3=myPos<3;
+    myResultHtml=`<div class="feedback ${myPos===0?'ok':isTop3?'ok':'wait'}" style="margin-bottom:1rem">
+      <div class="feedback-icon">${myPos===0?'🏆':myPos===1?'🥈':myPos===2?'🥉':'🚀'}</div>
+      <div class="feedback-title">${myPos===0?'Líder de la missió!':'Posició #'+(myPos+1)+' de '+total}</div>
       <div class="feedback-sub">${myEntry.points} punts acumulats</div>
     </div>`;
   }
   document.getElementById('my-result-area').innerHTML=myResultHtml;
-  document.getElementById('alumne-ranking-list').innerHTML=ranking.slice(0,10).map((r,i)=>`
-    <div class="ranking-item ${i<3?'pos-'+(i+1):''}">
-      <div class="rank-pos">${medals[i]||('#'+(i+1))}</div>
-      <div class="rank-name">${r.name}${r.name===nom?' (tu)':''}</div>
-      <div class="rank-pts">${r.points} pts</div>
-    </div>`).join('');
+
+  const top3=ranking.slice(0,3);
+  const myRow=myPos>=3?`
+    <div style="border-top:1px solid rgba(79,195,247,0.15);margin:4px 0;padding-top:4px;">
+      <div class="ranking-item" style="border-color:rgba(79,195,247,0.4)">
+        <div class="rank-pos" style="color:var(--accent)">#${myPos+1}</div>
+        <div class="rank-name">${nom} <span style="font-size:0.75rem;color:var(--muted)">(tu · ${total} en total)</span></div>
+        <div class="rank-pts">${myEntry?myEntry.points:0} pts</div>
+      </div>
+    </div>`:''
+
+  document.getElementById('alumne-ranking-list').innerHTML=
+    top3.map((r,i)=>`
+      <div class="ranking-item ${i<3?'pos-'+(i+1):''}">
+        <div class="rank-pos">${medals[i]}</div>
+        <div class="rank-name">${r.name}${r.name===nom?' <span style="font-size:0.75rem;color:var(--muted)">(tu)</span>':''}</div>
+        <div class="rank-pts">${r.points} pts</div>
+      </div>`).join('')+myRow;
 }
 </script>
 </body>
