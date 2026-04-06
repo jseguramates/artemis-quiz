@@ -5,111 +5,113 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Artemis Quiz — Panell del Professor</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root {
-  --space: #020818;
-  --deep: #050d2a;
-  --panel: #0a1535;
-  --accent: #4fc3f7;
-  --accent2: #7c4dff;
-  --gold: #ffd54f;
-  --green: #69f0ae;
-  --red: #ff5252;
-  --text: #e8f4fd;
-  --muted: #7a9cc0;
-  --border: rgba(79,195,247,0.2);
+  --space:#020818;--deep:#050d2a;--panel:#0a1535;
+  --accent:#4fc3f7;--accent2:#7c4dff;--gold:#ffd54f;
+  --green:#69f0ae;--red:#ff5252;--text:#e8f4fd;--muted:#7a9cc0;
+  --border:rgba(79,195,247,0.2);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--space); color: var(--text); font-family: 'Exo 2', sans-serif; min-height: 100vh; overflow-x: hidden; }
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background: radial-gradient(ellipse at 20% 50%, rgba(124,77,255,0.08) 0%, transparent 60%),
-              radial-gradient(ellipse at 80% 20%, rgba(79,195,247,0.06) 0%, transparent 50%);
-  pointer-events: none; z-index: 0;
-}
-.stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-.star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; animation: twinkle var(--d, 3s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
-@keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
-.container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--space);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(124,77,255,0.08),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(79,195,247,0.06),transparent 50%);pointer-events:none;z-index:0;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+.container{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:2rem 1.5rem;}
 
-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-.logo-moon { width: 48px; height: 48px; background: radial-gradient(circle at 35% 35%, #fff8e1, #ffd54f, #f57f17); border-radius: 50%; position: relative; box-shadow: 0 0 20px rgba(255,213,79,0.4); flex-shrink: 0; }
-.logo-moon::after { content: ''; position: absolute; top: 6px; right: 4px; width: 14px; height: 14px; background: var(--space); border-radius: 50%; }
-h1 { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; color: var(--accent); }
-h1 span { color: var(--gold); }
-.subtitle-header { font-size: 0.8rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-.status-pill { margin-left: auto; display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 99px; padding: 6px 16px; font-size: 0.8rem; color: var(--muted); }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
-.status-dot.on { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+header{display:flex;align-items:center;gap:1rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.logo-moon{width:48px;height:48px;background:radial-gradient(circle at 35% 35%,#fff8e1,#ffd54f,#f57f17);border-radius:50%;position:relative;box-shadow:0 0 20px rgba(255,213,79,0.4);flex-shrink:0;}
+.logo-moon::after{content:'';position:absolute;top:6px;right:4px;width:14px;height:14px;background:var(--space);border-radius:50%;}
+h1{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;letter-spacing:2px;color:var(--accent);}
+h1 span{color:var(--gold);}
+.subtitle-header{font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.status-pill{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:0.8rem;color:var(--muted);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
+.status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
-.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
-.panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
-.panel-title { font-family: 'Orbitron', monospace; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
+.main-grid{display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.panel-title{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem;}
 
-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.5px; display: block; margin-bottom: 6px; margin-top: 1rem; }
-label:first-of-type { margin-top: 0; }
-input[type="text"], input[type="number"], select, textarea {
-  width: 100%; background: var(--deep); border: 1px solid var(--border); border-radius: 10px;
-  padding: 12px 16px; color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s;
-}
-input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-select option { background: var(--deep); }
-textarea { resize: vertical; min-height: 80px; font-size: 0.85rem; line-height: 1.5; }
+/* TABS BIBLIOTECA */
+.tabs{display:flex;gap:6px;margin-bottom:1rem;}
+.tab{padding:6px 16px;font-size:0.75rem;font-family:'Orbitron',monospace;letter-spacing:1px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.tab.active-easy{background:rgba(105,240,174,0.12);border-color:rgba(105,240,174,0.4);color:var(--green);}
+.tab.active-mid{background:rgba(255,213,79,0.12);border-color:rgba(255,213,79,0.4);color:var(--gold);}
+.tab.active-hard{background:rgba(255,82,82,0.12);border-color:rgba(255,82,82,0.4);color:var(--red);}
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; border-radius: 10px; border: none; font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
-.btn-launch { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: white; width: 100%; margin-top: 1.25rem; padding: 16px; font-size: 0.9rem; box-shadow: 0 4px 20px rgba(79,195,247,0.3); }
-.btn-launch:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(79,195,247,0.4); }
-.btn-next { background: linear-gradient(135deg, #1b5e20, var(--green)); color: var(--space); width: 100%; padding: 16px; margin-top: 0.75rem; }
-.btn-reset { background: transparent; border: 1px solid var(--red); color: var(--red); font-family: 'Orbitron', monospace; font-size: 0.7rem; padding: 8px 16px; border-radius: 8px; cursor: pointer; letter-spacing: 1px; margin-top: 0.5rem; }
-.btn-reset:hover { background: rgba(255,82,82,0.1); }
-.btn-close { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: white; width: 100%; padding: 14px; font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
-.btn-close:hover { opacity: 0.85; }
+.lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.lib-card{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s;text-align:left;}
+.lib-card:hover{border-color:var(--accent);background:rgba(79,195,247,0.05);}
+.lib-card.selected{border-color:var(--gold);background:rgba(255,213,79,0.06);}
+.lib-eq{font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--gold);margin-bottom:4px;}
+.lib-sol{font-size:0.7rem;color:var(--muted);}
 
-.library-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
-.lib-card { background: var(--deep); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: all 0.2s; text-align: left; }
-.lib-card:hover { border-color: var(--accent); background: rgba(79,195,247,0.06); }
-.lib-card.selected { border-color: var(--gold); background: rgba(255,213,79,0.06); }
-.lib-eq { font-family: 'Orbitron', monospace; font-size: 0.85rem; color: var(--gold); margin-bottom: 4px; }
-.lib-sol { font-size: 0.75rem; color: var(--muted); }
-.lib-diff { display: inline-block; font-size: 0.65rem; padding: 2px 7px; border-radius: 99px; font-family: 'Orbitron', monospace; margin-top: 4px; }
-.diff-basic { background: rgba(105,240,174,0.1); color: var(--green); border: 1px solid rgba(105,240,174,0.2); }
-.diff-mid { background: rgba(255,213,79,0.1); color: var(--gold); border: 1px solid rgba(255,213,79,0.2); }
-.diff-hard { background: rgba(255,82,82,0.1); color: var(--red); border: 1px solid rgba(255,82,82,0.2); }
+.divider{display:flex;align-items:center;gap:12px;margin:1rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider span{font-size:0.7rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 
-.divider { display: flex; align-items: center; gap: 12px; margin: 1rem 0; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.divider span { font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+label{font-size:0.8rem;color:var(--muted);letter-spacing:0.5px;display:block;margin-bottom:6px;margin-top:1rem;}
+label:first-of-type{margin-top:0;}
+input[type="text"],input[type="number"],select{width:100%;background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:1rem;outline:none;transition:border-color 0.2s;}
+input:focus,select:focus{border-color:var(--accent);}
+select option{background:var(--deep);}
 
-.eq-display { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 700; text-align: center; color: var(--gold); padding: 1.5rem; background: var(--deep); border-radius: 12px; border: 1px solid rgba(255,213,79,0.2); margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255,213,79,0.4); letter-spacing: 2px; }
-.countdown { font-family: 'Orbitron', monospace; font-size: 4rem; font-weight: 900; text-align: center; color: var(--accent); text-shadow: 0 0 30px rgba(79,195,247,0.6); line-height: 1; margin: 0.5rem 0; }
-.countdown.urgent { color: var(--red); text-shadow: 0 0 30px rgba(255,82,82,0.6); animation: shake 0.3s infinite; }
-@keyframes shake { 0%,100%{transform:none} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
-.resp-count { text-align: center; font-size: 0.9rem; color: var(--muted); margin-bottom: 1.25rem; }
-.resp-count strong { color: var(--green); font-size: 1.2rem; }
+.btn-launch{background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;width:100%;margin-top:1.25rem;padding:16px;font-size:0.9rem;box-shadow:0 4px 20px rgba(79,195,247,0.3);border:none;border-radius:10px;font-family:'Orbitron',monospace;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.btn-launch:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,195,247,0.4);}
+.btn-next{background:linear-gradient(135deg,#1b5e20,var(--green));color:var(--space);width:100%;padding:16px;margin-top:0.75rem;border:none;border-radius:10px;font-family:'Orbitron',monospace;font-weight:700;letter-spacing:1px;cursor:pointer;}
+.btn-reset{background:transparent;border:1px solid var(--red);color:var(--red);font-family:'Orbitron',monospace;font-size:0.7rem;padding:8px 16px;border-radius:8px;cursor:pointer;letter-spacing:1px;margin-top:0.5rem;}
+.btn-reset:hover{background:rgba(255,82,82,0.1);}
+.btn-close{background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;width:100%;padding:14px;font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.btn-pdf{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Orbitron',monospace;font-size:0.7rem;padding:9px 18px;border-radius:8px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-pdf:hover{background:rgba(255,213,79,0.1);}
 
-.solution-reveal { text-align: center; margin-bottom: 1.25rem; padding: 1rem; background: rgba(105,240,174,0.08); border: 1px solid rgba(105,240,174,0.2); border-radius: 10px; }
-.solution-reveal .sol-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-.solution-reveal .sol-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; color: var(--green); font-weight: 700; }
+.eq-display{font-family:'Orbitron',monospace;font-size:2rem;font-weight:700;text-align:center;color:var(--gold);padding:1.5rem;background:var(--deep);border-radius:12px;border:1px solid rgba(255,213,79,0.2);margin-bottom:1rem;text-shadow:0 0 20px rgba(255,213,79,0.4);letter-spacing:2px;}
+.countdown{font-family:'Orbitron',monospace;font-size:4rem;font-weight:900;text-align:center;color:var(--accent);text-shadow:0 0 30px rgba(79,195,247,0.6);line-height:1;margin:0.5rem 0;}
+.countdown.urgent{color:var(--red);text-shadow:0 0 30px rgba(255,82,82,0.6);animation:shake 0.3s infinite;}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.resp-count{text-align:center;font-size:0.9rem;color:var(--muted);margin-bottom:1.25rem;}
+.resp-count strong{color:var(--green);font-size:1.2rem;}
 
-table { width: 100%; border-collapse: collapse; }
-th { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left; }
-td { padding: 10px 12px; border-bottom: 1px solid rgba(79,195,247,0.08); font-size: 0.9rem; }
-tr:last-child td { border-bottom: none; }
-.badge { display: inline-block; font-size: 0.7rem; padding: 3px 10px; border-radius: 99px; font-weight: 700; font-family: 'Orbitron', monospace; letter-spacing: 0.5px; }
-.badge-ok { background: rgba(105,240,174,0.15); color: var(--green); border: 1px solid rgba(105,240,174,0.3); }
-.badge-ko { background: rgba(255,82,82,0.15); color: var(--red); border: 1px solid rgba(255,82,82,0.3); }
+.solution-reveal{text-align:center;margin-bottom:1.25rem;padding:1rem;background:rgba(105,240,174,0.08);border:1px solid rgba(105,240,174,0.2);border-radius:10px;}
+.sol-label{font-size:0.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.sol-val{font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--green);font-weight:700;}
 
-.ranking-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; margin-bottom: 6px; background: var(--deep); border: 1px solid var(--border); }
-.ranking-item.pos-1 { background: rgba(255,213,79,0.1); border-color: rgba(255,213,79,0.3); }
-.ranking-item.pos-2 { background: rgba(176,190,197,0.08); border-color: rgba(176,190,197,0.2); }
-.ranking-item.pos-3 { background: rgba(255,138,101,0.08); border-color: rgba(255,138,101,0.2); }
-.rank-pos { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 900; width: 32px; color: var(--muted); }
-.pos-1 .rank-pos { color: var(--gold); text-shadow: 0 0 10px rgba(255,213,79,0.5); }
-.pos-2 .rank-pos { color: #b0bec5; }
-.pos-3 .rank-pos { color: #ff8a65; }
-.rank-name { flex: 1; font-size: 1rem; font-weight: 500; }
-.rank-pts { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--accent); }
+table{width:100%;border-collapse:collapse;}
+th{font-size:0.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;}
+td{padding:10px 12px;border-bottom:1px solid rgba(79,195,247,0.08);font-size:0.9rem;}
+tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;font-size:0.7rem;padding:3px 10px;border-radius:99px;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:0.5px;}
+.badge-ok{background:rgba(105,240,174,0.15);color:var(--green);border:1px solid rgba(105,240,174,0.3);}
+.badge-ko{background:rgba(255,82,82,0.15);color:var(--red);border:1px solid rgba(255,82,82,0.3);}
+
+.ranking-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;margin-bottom:6px;background:var(--deep);border:1px solid var(--border);}
+.ranking-item.pos-1{background:rgba(255,213,79,0.1);border-color:rgba(255,213,79,0.3);}
+.ranking-item.pos-2{background:rgba(176,190,197,0.08);border-color:rgba(176,190,197,0.2);}
+.ranking-item.pos-3{background:rgba(255,138,101,0.08);border-color:rgba(255,138,101,0.2);}
+.rank-pos{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;width:32px;color:var(--muted);}
+.pos-1 .rank-pos{color:var(--gold);text-shadow:0 0 10px rgba(255,213,79,0.5);}
+.pos-2 .rank-pos{color:#b0bec5;}
+.pos-3 .rank-pos{color:#ff8a65;}
+.rank-name{flex:1;font-size:1rem;font-weight:500;}
+.rank-pts{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--accent);}
+
+/* SIDEBAR ALUMNES */
+.sidebar-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;overflow:hidden;}
+.sidebar-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);}
+.student-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;margin-bottom:6px;background:var(--deep);border:1px solid var(--border);}
+.student-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);flex-shrink:0;}
+.student-name{flex:1;font-size:0.9rem;color:var(--text);}
+.student-pts{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--accent);}
+.btn-kick{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:0.8rem;padding:2px 6px;border-radius:4px;opacity:0.6;transition:opacity 0.2s;}
+.btn-kick:hover{opacity:1;background:rgba(255,82,82,0.1);}
+.empty-students{font-size:0.8rem;color:var(--muted);text-align:center;padding:1rem 0;}
+.pdf-bar{display:flex;justify-content:flex-end;margin-bottom:1rem;}
 </style>
 </head>
 <body>
@@ -127,60 +129,82 @@ tr:last-child td { border-bottom: none; }
     </div>
   </header>
 
-  <!-- SETUP -->
-  <div id="prof-setup">
-    <div class="panel">
-      <div class="panel-title">Biblioteca de preguntes</div>
-      <div class="library-grid" id="library-grid"></div>
-      <div class="divider"><span>o escriu una pregunta nova</span></div>
-      <label>Operació amb monomis</label>
-      <input type="text" id="inp-pregunta" placeholder="ex: 3x² · 2x³ = ?" />
-      <label>Resposta correcta</label>
-      <input type="text" id="inp-solucio" placeholder="ex: 6x⁵" />
-      <label>Temps (segons)</label>
-      <select id="inp-temps">
-        <option value="30">30 s</option>
-        <option value="45" selected>45 s</option>
-        <option value="60">60 s</option>
-        <option value="90">90 s</option>
-      </select>
-      <button class="btn btn-launch" onclick="launchQuestion()">&#9654; Llançar pregunta</button>
-    </div>
+  <div class="pdf-bar">
+    <button class="btn-pdf" onclick="downloadPDF()">&#8595; Descarregar resum PDF</button>
   </div>
 
-  <!-- ACTIVA -->
-  <div id="prof-active" style="display:none">
-    <div class="panel">
-      <div class="panel-title">Pregunta en curs</div>
-      <div class="eq-display" id="prof-eq-display"></div>
-      <div class="countdown" id="prof-counter">45</div>
-      <div class="resp-count"><strong id="resp-num">0</strong> respostes rebudes</div>
-      <button class="btn-close" onclick="closeQuestion()">Tancar ronda i veure resultats</button>
-      <div style="text-align:center; margin-top:0.75rem;">
-        <button class="btn-reset" onclick="resetGame()">Reiniciar joc</button>
+  <div class="main-grid">
+    <!-- COLUMNA PRINCIPAL -->
+    <div>
+      <!-- SETUP -->
+      <div id="prof-setup">
+        <div class="panel">
+          <div class="panel-title">Biblioteca de preguntes</div>
+          <div class="tabs">
+            <button class="tab active-easy" onclick="setTab('easy',this)">Fàcil</button>
+            <button class="tab" onclick="setTab('mid',this)">Mitjà</button>
+            <button class="tab" onclick="setTab('hard',this)">Difícil</button>
+          </div>
+          <div class="lib-grid" id="lib-grid"></div>
+          <div class="divider"><span>o escriu una pregunta nova</span></div>
+          <label>Operació amb monomis</label>
+          <input type="text" id="inp-pregunta" placeholder="ex: 3x² · 2x³ = ?" />
+          <label>Resposta correcta</label>
+          <input type="text" id="inp-solucio" placeholder="ex: 6x⁵" />
+          <label>Temps (segons)</label>
+          <select id="inp-temps">
+            <option value="30">30 s</option>
+            <option value="45" selected>45 s</option>
+            <option value="60">60 s</option>
+            <option value="90">90 s</option>
+          </select>
+          <button class="btn-launch" onclick="launchQuestion()">&#9654; Llançar pregunta</button>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- RESULTATS -->
-  <div id="prof-results" style="display:none">
-    <div class="panel">
-      <div class="panel-title">Resultats de la ronda</div>
-      <div class="solution-reveal">
-        <div class="sol-label">Resposta correcta</div>
-        <div class="sol-val" id="prof-sol-display"></div>
+      <!-- ACTIVA -->
+      <div id="prof-active" style="display:none">
+        <div class="panel">
+          <div class="panel-title">Pregunta en curs</div>
+          <div class="eq-display" id="prof-eq-display"></div>
+          <div class="countdown" id="prof-counter">45</div>
+          <div class="resp-count"><strong id="resp-num">0</strong> respostes rebudes</div>
+          <button class="btn-close" onclick="closeQuestion()">Tancar ronda i veure resultats</button>
+          <div style="text-align:center;margin-top:0.75rem;">
+            <button class="btn-reset" onclick="resetGame()">Reiniciar joc</button>
+          </div>
+        </div>
       </div>
-      <table>
-        <thead><tr><th>Alumne</th><th>Resposta</th><th>Resultat</th><th>Punts</th></tr></thead>
-        <tbody id="prof-resp-tbody"></tbody>
-      </table>
+
+      <!-- RESULTATS -->
+      <div id="prof-results" style="display:none">
+        <div class="panel">
+          <div class="panel-title">Resultats de la ronda</div>
+          <div class="solution-reveal">
+            <div class="sol-label">Resposta correcta</div>
+            <div class="sol-val" id="prof-sol-display"></div>
+          </div>
+          <table>
+            <thead><tr><th>Alumne</th><th>Resposta</th><th>Resultat</th><th>Punts</th></tr></thead>
+            <tbody id="prof-resp-tbody"></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Ranking de la missió</div>
+          <div id="prof-ranking-list"></div>
+          <button class="btn btn-next" onclick="nextQuestion()">&#9654; Propera pregunta</button>
+          <div style="text-align:center;margin-top:0.5rem;">
+            <button class="btn-reset" onclick="resetGame()">Reiniciar joc complet</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="panel">
-      <div class="panel-title">Ranking de la missió</div>
-      <div id="prof-ranking-list"></div>
-      <button class="btn btn-next" onclick="nextQuestion()">&#9654; Propera pregunta</button>
-      <div style="text-align:center; margin-top:0.5rem;">
-        <button class="btn-reset" onclick="resetGame()">Reiniciar joc complet</button>
+
+    <!-- SIDEBAR -->
+    <div>
+      <div class="sidebar-panel">
+        <div class="panel-title">Alumnes connectats</div>
+        <div id="students-list"><div class="empty-students">Esperant alumnes...</div></div>
       </div>
     </div>
   </div>
@@ -189,137 +213,176 @@ tr:last-child td { border-bottom: none; }
 <script>
 const DB = 'https://monomis-quiz-default-rtdb.europe-west1.firebasedatabase.app';
 let pollInterval = null, countdownInterval = null;
+let currentTab = 'easy';
+let allResults = [];
+let roundHistory = [];
 
-const LIBRARY = [
-  { eq: '3x² · 2x³', sol: '6x⁵', diff: 'basic' },
-  { eq: '5x³ · 4x²', sol: '20x⁵', diff: 'basic' },
-  { eq: '(2x²)³', sol: '8x⁶', diff: 'basic' },
-  { eq: '12x⁵ ÷ 4x²', sol: '3x³', diff: 'basic' },
-  { eq: '(-3x²) · 2x', sol: '-6x³', diff: 'mid' },
-  { eq: '(2x³)² · 3x', sol: '12x⁷', diff: 'mid' },
-  { eq: '15x⁴y² ÷ 5x²y', sol: '3x²y', diff: 'mid' },
-  { eq: '(-2x²y)³', sol: '-8x⁶y³', diff: 'hard' },
-  { eq: '4x³y · (-3x²y²)', sol: '-12x⁵y³', diff: 'hard' },
-  { eq: '(3x²y)² ÷ 3xy', sol: '3x³y', diff: 'hard' },
-];
-
-const DIFF_LABELS = { basic: 'Bàsic', mid: 'Mitjà', hard: 'Difícil' };
+const LIBRARY = {
+  easy: [
+    {eq:'3x² · 2x³ = ?', sol:'6x⁵'},
+    {eq:'5x³ · 4x² = ?', sol:'20x⁵'},
+    {eq:'(2x²)³ = ?',    sol:'8x⁶'},
+    {eq:'12x⁵ ÷ 4x² = ?',sol:'3x³'},
+  ],
+  mid: [
+    {eq:'(-3x²) · 2x = ?',   sol:'-6x³'},
+    {eq:'(2x³)² · 3x = ?',   sol:'12x⁷'},
+    {eq:'15x⁴y² ÷ 5x²y = ?', sol:'3x²y'},
+    {eq:'(3x²)² ÷ 3x = ?',   sol:'3x³'},
+  ],
+  hard: [
+    {eq:'(-2x²y)³ = ?',        sol:'-8x⁶y³'},
+    {eq:'4x³y · (-3x²y²) = ?', sol:'-12x⁵y³'},
+    {eq:'(3x²y)² ÷ 3xy = ?',   sol:'3x³y'},
+    {eq:'(-xy²)⁴ · 2x = ?',    sol:'2x⁵y⁸'},
+  ]
+};
 
 function mkStars() {
   const c = document.getElementById('stars');
-  for (let i = 0; i < 120; i++) {
+  for (let i=0;i<120;i++) {
     const s = document.createElement('div');
-    s.className = 'star';
-    s.style.left = Math.random()*100+'%';
-    s.style.top = Math.random()*100+'%';
-    s.style.setProperty('--d', (2+Math.random()*4)+'s');
-    s.style.setProperty('--delay', (Math.random()*4)+'s');
-    s.style.opacity = Math.random()*0.8;
+    s.className='star';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--d',(2+Math.random()*4)+'s');
+    s.style.setProperty('--delay',(Math.random()*4)+'s');
+    s.style.opacity=Math.random()*0.8;
     c.appendChild(s);
   }
 }
 mkStars();
 
-function renderLibrary() {
-  document.getElementById('library-grid').innerHTML = LIBRARY.map((q, i) => `
-    <button class="lib-card" onclick="selectFromLibrary(${i})" id="lib-${i}">
-      <div class="lib-eq">${q.eq} = ?</div>
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => { t.className='tab'; });
+  el.className = 'tab active-'+tab;
+  renderLib();
+}
+
+function renderLib() {
+  const qs = LIBRARY[currentTab];
+  document.getElementById('lib-grid').innerHTML = qs.map((q,i) => `
+    <button class="lib-card" onclick="selectQ(${i})" id="lib-${currentTab}-${i}">
+      <div class="lib-eq">${q.eq}</div>
       <div class="lib-sol">Sol: ${q.sol}</div>
-      <span class="lib-diff diff-${q.diff}">${DIFF_LABELS[q.diff]}</span>
     </button>`).join('');
 }
-renderLibrary();
+renderLib();
 
-function selectFromLibrary(i) {
-  document.querySelectorAll('.lib-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('lib-'+i).classList.add('selected');
-  document.getElementById('inp-pregunta').value = LIBRARY[i].eq + ' = ?';
-  document.getElementById('inp-solucio').value = LIBRARY[i].sol;
+function selectQ(i) {
+  document.querySelectorAll('.lib-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('lib-'+currentTab+'-'+i).classList.add('selected');
+  document.getElementById('inp-pregunta').value = LIBRARY[currentTab][i].eq;
+  document.getElementById('inp-solucio').value = LIBRARY[currentTab][i].sol;
 }
 
-async function fbGet(path) { const r = await fetch(DB + path + '.json'); return r.json(); }
-async function fbSet(path, data) { await fetch(DB + path + '.json', { method: 'PUT', body: JSON.stringify(data) }); }
-async function fbPatch(path, data) { await fetch(DB + path + '.json', { method: 'PATCH', body: JSON.stringify(data) }); }
-async function fbDelete(path) { await fetch(DB + path + '.json', { method: 'DELETE' }); }
+async function fbGet(p){const r=await fetch(DB+p+'.json');return r.json();}
+async function fbSet(p,d){await fetch(DB+p+'.json',{method:'PUT',body:JSON.stringify(d)});}
+async function fbPatch(p,d){await fetch(DB+p+'.json',{method:'PATCH',body:JSON.stringify(d)});}
+async function fbDelete(p){await fetch(DB+p+'.json',{method:'DELETE'});}
 
 async function init() {
   try {
     await fbGet('/game');
-    document.getElementById('status-dot').className = 'status-dot on';
-    document.getElementById('status-text').textContent = 'Connectat';
+    document.getElementById('status-dot').className='status-dot on';
+    document.getElementById('status-text').textContent='Connectat';
   } catch(e) {
-    document.getElementById('status-text').textContent = 'Error de connexió';
+    document.getElementById('status-text').textContent='Error de connexió';
   }
+  startSidebarPoll();
 }
 init();
+
+function startSidebarPoll() {
+  updateSidebar();
+  setInterval(updateSidebar, 3000);
+}
+
+async function updateSidebar() {
+  const players = await fbGet('/players') || {};
+  const list = Object.entries(players).sort((a,b)=>(b[1].points||0)-(a[1].points||0));
+  const el = document.getElementById('students-list');
+  if (!list.length) { el.innerHTML='<div class="empty-students">Esperant alumnes...</div>'; return; }
+  el.innerHTML = list.map(([key, p]) => `
+    <div class="student-item">
+      <div class="student-dot"></div>
+      <div class="student-name">${p.name}</div>
+      <div class="student-pts">${p.points||0}pts</div>
+      <button class="btn-kick" onclick="kickPlayer('${key}','${p.name}')" title="Expulsar">✕</button>
+    </div>`).join('');
+}
+
+async function kickPlayer(key, name) {
+  if (!confirm(`Segur que vols expulsar "${name}"?`)) return;
+  await fbSet('/players/'+key+'/kicked', true);
+  await fbDelete('/players/'+key);
+  updateSidebar();
+}
 
 async function launchQuestion() {
   const q = document.getElementById('inp-pregunta').value.trim();
   const sol = document.getElementById('inp-solucio').value.trim();
   const temps = parseInt(document.getElementById('inp-temps').value);
-  if (!q || !sol) { alert('Omple la pregunta i la solució!'); return; }
+  if (!q||!sol) { alert('Omple la pregunta i la solució!'); return; }
   const qId = Date.now();
-  await fbSet('/game', { phase: 'active', question: q, solution: sol, questionId: qId, timeLimit: temps, startedAt: Date.now(), responses: {}, ranking: [] });
-  document.getElementById('prof-setup').style.display = 'none';
-  document.getElementById('prof-active').style.display = 'block';
-  document.getElementById('prof-results').style.display = 'none';
-  document.getElementById('prof-eq-display').textContent = q;
+  await fbSet('/game',{phase:'active',question:q,solution:sol,questionId:qId,timeLimit:temps,startedAt:Date.now(),responses:{},ranking:[]});
+  document.getElementById('prof-setup').style.display='none';
+  document.getElementById('prof-active').style.display='block';
+  document.getElementById('prof-results').style.display='none';
+  document.getElementById('prof-eq-display').textContent=q;
   startCountdown(temps);
   startProfPoll();
 }
 
 function startCountdown(secs) {
-  let t = secs;
-  const el = document.getElementById('prof-counter');
-  el.textContent = t; el.className = 'countdown';
+  let t=secs;
+  const el=document.getElementById('prof-counter');
+  el.textContent=t; el.className='countdown';
   if (countdownInterval) clearInterval(countdownInterval);
-  countdownInterval = setInterval(async () => {
+  countdownInterval=setInterval(async()=>{
     t--;
-    el.textContent = t;
-    if (t <= 10) el.className = 'countdown urgent';
-    if (t <= 0) { clearInterval(countdownInterval); await closeQuestion(); }
-  }, 1000);
+    el.textContent=t;
+    if (t<=10) el.className='countdown urgent';
+    if (t<=0){clearInterval(countdownInterval);await closeQuestion();}
+  },1000);
 }
 
 function startProfPoll() {
   if (pollInterval) clearInterval(pollInterval);
-  pollProf(); pollInterval = setInterval(pollProf, 2000);
+  pollProf(); pollInterval=setInterval(pollProf,2000);
 }
 
 async function pollProf() {
-  const state = await fbGet('/game');
-  if (!state || state.phase !== 'active') return;
-  const responses = state.responses || {};
-  document.getElementById('resp-num').textContent = Object.keys(responses).length;
+  const state=await fbGet('/game');
+  if (!state||state.phase!=='active') return;
+  const responses=state.responses||{};
+  document.getElementById('resp-num').textContent=Object.keys(responses).length;
 }
 
 async function closeQuestion() {
   if (countdownInterval) clearInterval(countdownInterval);
   if (pollInterval) clearInterval(pollInterval);
-  const state = await fbGet('/game');
+  const state=await fbGet('/game');
   if (!state) return;
-  const responses = state.responses || {};
-  const players = await fbGet('/players') || {};
-  const ranking = Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0)).map(p=>({name:p.name,points:p.points||0}));
-  await fbPatch('/game', { phase: 'results', ranking });
-  renderResults(responses, state.solution, ranking);
-  document.getElementById('prof-active').style.display = 'none';
-  document.getElementById('prof-results').style.display = 'block';
+  const responses=state.responses||{};
+  const players=await fbGet('/players')||{};
+  const ranking=Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0)).map(p=>({name:p.name,points:p.points||0}));
+  await fbPatch('/game',{phase:'results',ranking});
+  roundHistory.push({question:state.question,solution:state.solution,responses});
+  renderResults(responses,state.solution,ranking);
+  document.getElementById('prof-active').style.display='none';
+  document.getElementById('prof-results').style.display='block';
 }
 
-function renderResults(responses, solution, ranking) {
-  document.getElementById('prof-sol-display').textContent = solution;
-  const rows = Object.values(responses).sort((a,b)=>a.time-b.time);
-  document.getElementById('prof-resp-tbody').innerHTML = rows.length
-    ? rows.map(r=>`<tr>
-        <td>${r.name}</td>
-        <td style="font-family:monospace">${r.answer}</td>
-        <td><span class="badge ${r.correct?'badge-ok':'badge-ko'}">${r.correct?'CORRECTE':'INCORRECTE'}</span></td>
-        <td style="color:var(--gold);font-weight:700">+${r.points}</td>
-      </tr>`).join('')
+function renderResults(responses,solution,ranking) {
+  document.getElementById('prof-sol-display').textContent=solution;
+  const rows=Object.values(responses).sort((a,b)=>a.time-b.time);
+  document.getElementById('prof-resp-tbody').innerHTML=rows.length
+    ? rows.map(r=>`<tr><td>${r.name}</td><td style="font-family:monospace">${r.answer}</td><td><span class="badge ${r.correct?'badge-ok':'badge-ko'}">${r.correct?'CORRECTE':'INCORRECTE'}</span></td><td style="color:var(--gold);font-weight:700">+${r.points}</td></tr>`).join('')
     : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1rem">Cap resposta rebuda</td></tr>';
-  const medals = ['🥇','🥈','🥉'];
-  document.getElementById('prof-ranking-list').innerHTML = ranking.slice(0,10).map((r,i)=>`
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('prof-ranking-list').innerHTML=ranking.slice(0,10).map((r,i)=>`
     <div class="ranking-item ${i<3?'pos-'+(i+1):''}">
       <div class="rank-pos">${medals[i]||('#'+(i+1))}</div>
       <div class="rank-name">${r.name}</div>
@@ -328,26 +391,106 @@ function renderResults(responses, solution, ranking) {
 }
 
 async function nextQuestion() {
-  await fbSet('/game', { phase: 'waiting' });
-  document.getElementById('inp-pregunta').value = '';
-  document.getElementById('inp-solucio').value = '';
-  document.querySelectorAll('.lib-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('prof-setup').style.display = 'block';
-  document.getElementById('prof-results').style.display = 'none';
+  await fbSet('/game',{phase:'waiting'});
+  document.getElementById('inp-pregunta').value='';
+  document.getElementById('inp-solucio').value='';
+  document.querySelectorAll('.lib-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('prof-setup').style.display='block';
+  document.getElementById('prof-results').style.display='none';
 }
 
 async function resetGame() {
   if (!confirm('Segur? Això esborrarà tots els punts i jugadors.')) return;
-  await fbSet('/game', { phase: 'waiting' });
+  await fbSet('/game',{phase:'waiting'});
   await fbDelete('/players');
-  document.getElementById('inp-pregunta').value = '';
-  document.getElementById('inp-solucio').value = '';
-  document.querySelectorAll('.lib-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('prof-active').style.display = 'none';
-  document.getElementById('prof-results').style.display = 'none';
-  document.getElementById('prof-setup').style.display = 'block';
+  roundHistory=[];
+  document.getElementById('inp-pregunta').value='';
+  document.getElementById('inp-solucio').value='';
+  document.querySelectorAll('.lib-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('prof-active').style.display='none';
+  document.getElementById('prof-results').style.display='none';
+  document.getElementById('prof-setup').style.display='block';
   if (countdownInterval) clearInterval(countdownInterval);
   if (pollInterval) clearInterval(pollInterval);
+}
+
+async function downloadPDF() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(20,30,80);
+  doc.text('ARTEMIS QUIZ — Resum de resultats', 14, 20);
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100,100,100);
+  doc.text('Missió Monomis · ' + new Date().toLocaleDateString('ca-ES',{day:'2-digit',month:'long',year:'numeric'}), 14, 28);
+
+  if (!roundHistory.length) {
+    doc.setFontSize(12);
+    doc.setTextColor(150,150,150);
+    doc.text('Encara no hi ha rondes completades.', 14, 50);
+    doc.save('artemis-quiz-resultats.pdf');
+    return;
+  }
+
+  let y = 38;
+  const players = await fbGet('/players') || {};
+  const ranking = Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0));
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.setTextColor(20,30,80);
+  doc.text('Ranking final', 14, y);
+  y += 6;
+
+  doc.autoTable({
+    startY: y,
+    head: [['Posició','Alumne','Punts totals']],
+    body: ranking.map((r,i)=>['#'+(i+1), r.name, r.points+' pts']),
+    styles:{fontSize:10, cellPadding:4},
+    headStyles:{fillColor:[10,21,53], textColor:[79,195,247], fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[240,245,255]},
+    margin:{left:14,right:14}
+  });
+  y = doc.lastAutoTable.finalY + 12;
+
+  roundHistory.forEach((round, ri) => {
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(20,30,80);
+    doc.text(`Ronda ${ri+1}: ${round.question}`, 14, y);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100,100,100);
+    doc.text(`Resposta correcta: ${round.solution}`, 14, y+5);
+    y += 10;
+
+    const rows = Object.values(round.responses||{}).sort((a,b)=>a.time-b.time);
+    if (!rows.length) {
+      doc.setFontSize(9);
+      doc.setTextColor(150,150,150);
+      doc.text('Cap resposta registrada.', 14, y+4);
+      y += 12;
+      return;
+    }
+    doc.autoTable({
+      startY: y,
+      head: [['Alumne','Resposta','Resultat','Punts']],
+      body: rows.map(r=>[r.name, r.answer, r.correct?'Correcte':'Incorrecte', '+'+r.points]),
+      styles:{fontSize:9, cellPadding:3},
+      headStyles:{fillColor:[10,21,53], textColor:[79,195,247]},
+      bodyStyles:{textColor:[30,30,60]},
+      columnStyles:{2:{textColor: rows.map(r=>r.correct?[0,128,0]:[200,0,0])}},
+      margin:{left:14,right:14}
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  });
+
+  doc.save('artemis-quiz-resultats.pdf');
 }
 </script>
 </body>
