@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Artemis Quiz — Panell del Professor</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <style>
 :root {
   --space:#020818;--deep:#050d2a;--panel:#0a1535;
@@ -130,7 +129,7 @@ tr:last-child td{border-bottom:none;}
   </header>
 
   <div class="pdf-bar">
-    <button class="btn-pdf" onclick="downloadPDF()">&#8595; Descarregar resum PDF</button>
+    <button class="btn-pdf" onclick="downloadPDF()">&#8595; Descarregar resum PDF#8595; Descarregar resum</button>
   </div>
 
   <div class="main-grid">
@@ -415,82 +414,73 @@ async function resetGame() {
 }
 
 async function downloadPDF() {
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(18);
-  doc.setTextColor(20,30,80);
-  doc.text('ARTEMIS QUIZ — Resum de resultats', 14, 20);
-
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(10);
-  doc.setTextColor(100,100,100);
-  doc.text('Missió Monomis · ' + new Date().toLocaleDateString('ca-ES',{day:'2-digit',month:'long',year:'numeric'}), 14, 28);
-
-  if (!roundHistory.length) {
-    doc.setFontSize(12);
-    doc.setTextColor(150,150,150);
-    doc.text('Encara no hi ha rondes completades.', 14, 50);
-    doc.save('artemis-quiz-resultats.pdf');
-    return;
-  }
-
-  let y = 38;
   const players = await fbGet('/players') || {};
   const ranking = Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0));
+  const data = new Date().toLocaleDateString('ca-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const medals = ['🥇','🥈','🥉'];
 
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(12);
-  doc.setTextColor(20,30,80);
-  doc.text('Ranking final', 14, y);
-  y += 6;
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Artemis Quiz - Resultats</title>
+  <style>
+    body{font-family:Arial,sans-serif;color:#1a1a2e;padding:2rem;max-width:800px;margin:0 auto;}
+    h1{font-size:1.4rem;color:#0a1535;border-bottom:3px solid #4fc3f7;padding-bottom:0.5rem;margin-bottom:0.25rem;}
+    .sub{font-size:0.85rem;color:#888;margin-bottom:2rem;}
+    h2{font-size:1rem;color:#0a1535;margin:1.75rem 0 0.4rem;padding:6px 10px;background:#f0f6ff;border-left:3px solid #4fc3f7;}
+    .sol{font-size:0.85rem;color:#555;margin-bottom:0.5rem;padding-left:4px;}
+    table{width:100%;border-collapse:collapse;margin-bottom:0.5rem;font-size:0.88rem;}
+    th{background:#0a1535;color:#4fc3f7;padding:8px 10px;text-align:left;font-size:0.8rem;}
+    td{padding:7px 10px;border-bottom:1px solid #e8eef8;}
+    tr:nth-child(even) td{background:#f8faff;}
+    .ok{color:#2e7d32;font-weight:bold;}
+    .ko{color:#c62828;font-weight:bold;}
+    .no-data{color:#aaa;text-align:center;font-style:italic;padding:10px;}
+    @media print{h2{page-break-inside:avoid;}}
+  </style></head><body>
+  <h1>ARTEMIS QUIZ — Resum de resultats</h1>
+  <div class="sub">Missio Monomis &middot; ${data}</div>
+  <h2>Ranking final</h2>
+  <table><thead><tr><th>Posicio</th><th>Alumne</th><th>Punts totals</th></tr></thead><tbody>`;
 
-  doc.autoTable({
-    startY: y,
-    head: [['Posició','Alumne','Punts totals']],
-    body: ranking.map((r,i)=>['#'+(i+1), r.name, r.points+' pts']),
-    styles:{fontSize:10, cellPadding:4},
-    headStyles:{fillColor:[10,21,53], textColor:[79,195,247], fontStyle:'bold'},
-    alternateRowStyles:{fillColor:[240,245,255]},
-    margin:{left:14,right:14}
-  });
-  y = doc.lastAutoTable.finalY + 12;
-
-  roundHistory.forEach((round, ri) => {
-    if (y > 240) { doc.addPage(); y = 20; }
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(11);
-    doc.setTextColor(20,30,80);
-    doc.text(`Ronda ${ri+1}: ${round.question}`, 14, y);
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(9);
-    doc.setTextColor(100,100,100);
-    doc.text(`Resposta correcta: ${round.solution}`, 14, y+5);
-    y += 10;
-
-    const rows = Object.values(round.responses||{}).sort((a,b)=>a.time-b.time);
-    if (!rows.length) {
-      doc.setFontSize(9);
-      doc.setTextColor(150,150,150);
-      doc.text('Cap resposta registrada.', 14, y+4);
-      y += 12;
-      return;
-    }
-    doc.autoTable({
-      startY: y,
-      head: [['Alumne','Resposta','Resultat','Punts']],
-      body: rows.map(r=>[r.name, r.answer, r.correct?'Correcte':'Incorrecte', '+'+r.points]),
-      styles:{fontSize:9, cellPadding:3},
-      headStyles:{fillColor:[10,21,53], textColor:[79,195,247]},
-      bodyStyles:{textColor:[30,30,60]},
-      columnStyles:{2:{textColor: rows.map(r=>r.correct?[0,128,0]:[200,0,0])}},
-      margin:{left:14,right:14}
+  if (ranking.length) {
+    ranking.forEach((r,i) => {
+      html += `<tr><td>${medals[i]||'#'+(i+1)}</td><td>${r.name}</td><td><b>${r.points} pts</b></td></tr>`;
     });
-    y = doc.lastAutoTable.finalY + 10;
-  });
+  } else {
+    html += `<tr><td colspan="3" class="no-data">Sense dades</td></tr>`;
+  }
+  html += `</tbody></table>`;
 
-  doc.save('artemis-quiz-resultats.pdf');
+  if (!roundHistory.length) {
+    html += `<p style="color:#aaa;font-size:0.9rem;margin-top:1rem">Cap ronda completada encara.</p>`;
+  } else {
+    roundHistory.forEach((round, ri) => {
+      const rows = Object.values(round.responses||{}).sort((a,b)=>a.time-b.time);
+      html += `<h2>Ronda ${ri+1}: ${round.question}</h2>
+      <div class="sol">Resposta correcta: <b>${round.solution}</b></div>
+      <table><thead><tr><th>Alumne</th><th>Resposta</th><th>Resultat</th><th>Punts</th></tr></thead><tbody>`;
+      if (rows.length) {
+        rows.forEach(r => {
+          html += `<tr><td>${r.name}</td><td><code>${r.answer}</code></td>
+            <td class="${r.correct?'ok':'ko'}">${r.correct?'Correcte':'Incorrecte'}</td>
+            <td>${r.correct?'+'+r.points:'0'}</td></tr>`;
+        });
+      } else {
+        html += `<tr><td colspan="4" class="no-data">Cap resposta registrada</td></tr>`;
+      }
+      html += `</tbody></table>`;
+    });
+  }
+  html += `</body></html>`;
+
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'artemis-quiz-resultats.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
