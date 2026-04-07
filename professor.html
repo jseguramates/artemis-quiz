@@ -409,7 +409,7 @@ async function closeQuestion(){
   const players=await fbGet('/players')||{};
   const ranking=Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0)).map(p=>({name:p.name,points:p.points||0}));
   await fbPatch('/game',{phase:'results',ranking});
-  const roundEntry={question:state.question,solution:state.solution,responses,timestamp:Date.now(),timeLimit:state.timeLimit||45};
+  const roundEntry={question:state.question,solution:state.solution,responses,timestamp:Date.now(),startedAt:state.startedAt||Date.now(),timeLimit:state.timeLimit||45};
   const existing=await fbGet('/history')||[];
   const histArr=Array.isArray(existing)?existing:Object.values(existing);
   histArr.push(roundEntry);await fbSet('/history',histArr);
@@ -548,8 +548,22 @@ function downloadHistReport(){if(!selectedHistSession)return;generateAndDownload
 async function downloadReport(){
   const players=await fbGet('/players')||{};
   const ranking=Object.values(players).sort((a,b)=>(b.points||0)-(a.points||0));
+
   const raw=await fbGet('/history')||[];
-  const rounds=Array.isArray(raw)?raw:Object.values(raw);
+  let rounds=Array.isArray(raw)?raw:Object.values(raw);
+
+  if(!rounds.length){
+    const sessions=await fbGet('/sessions')||{};
+    const sessKeys=Object.keys(sessions).sort().reverse();
+    if(sessKeys.length){
+      const lastSess=sessions[sessKeys[0]];
+      const useRanking=(lastSess.ranking&&lastSess.ranking.length)?lastSess.ranking:ranking;
+      const useRounds=lastSess.rounds||[];
+      generateAndDownload(lastSess.name||sessionName||'Sessió actual',lastSess.date||new Date().toLocaleDateString('ca-ES'),useRanking,useRounds);
+      return;
+    }
+  }
+
   generateAndDownload(sessionName||'Sessió actual',new Date().toLocaleDateString('ca-ES'),ranking,rounds);
 }
 
@@ -563,7 +577,7 @@ function generateComment(playerName,rounds){
     const type=detectType(r.question);
     if(!byType[type])byType[type]={ok:0,total:0};
     byType[type].total++;if(resp.correct)byType[type].ok++;
-    if(resp.time&&r.timestamp){const e=(resp.time-(r.timestamp-(r.timeLimit||45)*1000));if(e>0&&e<90000){tSum+=e/1000;tCount++;}}
+    if(resp.time&&r.startedAt){const e=(resp.time-r.startedAt)/1000;if(e>0&&e<(r.timeLimit||90)){tSum+=e;tCount++;}}
   });
   const pct=Math.round((ok/total)*100);
   const avgTime=tCount?Math.round(tSum/tCount):null;
